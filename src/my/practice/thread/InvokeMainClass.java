@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +55,14 @@ public class InvokeMainClass {
 			//LOGGER.log(Level.INFO, "Result of invokeAny " + executor.invokeAny(callableList));
 
 			executor.shutdown();
-			LOGGER.log(Level.ALL, "Main finished");
+			try {
+				LOGGER.log(Level.INFO, "Is service shutdown? " + executor.awaitTermination(20, TimeUnit.MILLISECONDS));
+			} catch(InterruptedException inte) {
+				LOGGER.log(Level.SEVERE, "Service terminated abruptly");
+				executor.shutdownNow();
+			}
+
+			LOGGER.log(Level.INFO, "Main finished");
 
 		} catch(FileNotFoundException  fileNotFoundException) {;
 		LOGGER.log(Level.SEVERE, "FileNotFoundException {}", fileNotFoundException.getStackTrace());
